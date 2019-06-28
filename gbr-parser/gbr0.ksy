@@ -8,7 +8,7 @@ meta:
       - gbr
 seq:
      - id: magic
-       contents: [0x47, 0x42, 0x4F, 0x30]
+       contents: [0x47, 0x42, 0x4F, 0x30] #GBO0
      - id: objects
        type: gbr_object
        repeat: eos
