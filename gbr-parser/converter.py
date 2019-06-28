@@ -76,8 +76,6 @@ def export_images(basepath, images):
             image_path = os.path.join(set_path, str('%d.png' % j))
             images[i][j].save(image_path)
 
-
-
 if __name__ == '__main__':
     files = ['8x8.gbr', 'alpha.gbr', 'digits.gbr', 'shaded_alpha.gbr', 'shadow.gbr']
     for filename in files:
