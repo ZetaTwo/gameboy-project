@@ -83,7 +83,7 @@ types:
             - id: split_height
               type: u2
             - id: split_order
-              type: u1
+              type: u1 # Note: Official specification incorrectly says "long"
             - id: color_set
               type: u1
             - id: bookmarks
@@ -176,13 +176,13 @@ types:
               type: u2
             - id: count
               type: u2
-            - id: color_set
+            - id: colors
               type: object_palette
               repeat: expr
               repeat-expr: count
             - id: sgb_count
               type: u2
-            - id: sgb_color_set
+            - id: sgb_colors
               type: object_palette
               repeat: expr
               repeat-expr: sgb_count

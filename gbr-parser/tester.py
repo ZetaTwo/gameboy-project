@@ -3,7 +3,6 @@
 from kaitaistruct import KaitaiStream
 from kaitai_parser.gbr0 import Gbr0
 
-
 def parse_object_producer(body):
     print('Producer')
     print('\tName: %s' % body.name)
@@ -76,9 +75,9 @@ def parse_object_palettes(body):
     print('Palettes')
     print('\tID: %s' % body.id)
     print('\tCount: %s' % body.count)
-    print('\tColorSet:\n\t\t%s' % ',\n\t\t'.join([parse_object_palette(palette) for palette in body.color_set]))
+    print('\tColors:\n\t\t%s' % ',\n\t\t'.join([parse_object_palette(palette) for palette in body.colors]))
     print('\tSGBCount: %s' % body.sgb_count)
-    print('\tSGBColorSet:\n\t\t%s' % ',\n\t\t'.join([parse_object_palette(palette) for palette in body.sgb_color_set]))
+    print('\tSGBColors:\n\t\t%s' % ',\n\t\t'.join([parse_object_palette(palette) for palette in body.sgb_colors]))
 
 def parse_object_tile_pal(body):
     print('TilePal')
@@ -103,11 +102,18 @@ body_parsers = {
     0x00FF: parse_object_deleted,
 }
 
-with open('test/8x8.gbr', 'rb') as fin:
-    gbr0 = Gbr0(KaitaiStream(fin))
+def dump_gbr_file(file):
     print(gbr0.magic)
     for gbr_object in gbr0.objects:
         print('Type: %04X, ID: %d' % (gbr_object.object_type, gbr_object.object_id))
         print('Size: %d' % gbr_object.record_length)
         body_parsers[gbr_object.object_type](gbr_object.body)
         print('')
+
+if __name__ == '__main__':
+    files = ['8x8.gbr', 'alpha.gbr', 'digits.gbr', 'shaded_alpha.gbr', 'shadow.gbr']
+    for filename in files:
+        with open('test/%s' % filename, 'rb') as fin:
+            gbr0 = Gbr0(KaitaiStream(fin))
+            dump_gbr_file(gbr0)
+        print('---'*10)
