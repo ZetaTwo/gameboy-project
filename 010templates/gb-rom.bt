@@ -1,0 +1,52 @@
+//------------------------------------------------
+//--- 010 Editor v9.0.2 Binary Template
+//
+//      File: gameboy.bt
+//   Authors: Calle "Zeta Two" Svensson <calle.svensson@zeta-two.com>
+//   Version: 1
+//   Purpose: Gameboy ROM
+//  Category: Executable
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+FSeek( 0 );
+uchar rst1[8];
+uchar rst2[8];
+uchar rst3[8];
+uchar rst4[8];
+uchar rst5[8];
+uchar rst6[8];
+uchar rst7[8];
+uchar rst8[8];
+
+FSeek( 0x40 );
+uchar int1[8];
+uchar int2[8];
+uchar int3[8];
+uchar int4[8];
+uchar int5[8];
+
+FSeek( 0x100 );
+
+uchar entry[4];
+uchar nintendo_logo[48];
+char title[11];
+char manufacturer[4];
+uchar cgb_flag;
+char new_licensee_code[2];
+uchar sgb_flag;
+uchar cartridge_type;
+uchar rom_size;
+uchar ram_size;
+uchar destination_code;
+uchar old_licensee_code;
+uchar mask_rom_version_number;
+uchar header_checksum;
+uint16 global_checksum;
+
+FSeek( 0x150 );
+
+uchar bank0[0x3eb0];
+uchar bank1[0x4000];
