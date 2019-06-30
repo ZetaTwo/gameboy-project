@@ -86,8 +86,7 @@ types:
           repeat-expr: master.tile_count
       instances:
         master:
-          size: 0
-          process: find_master(master_id)
+          value: find_master(master_id) # <--- Doesn't work (https://github.com/kaitai-io/kaitai_struct/issues/172)
 
     object_map_tile_data_record:
       seq:
