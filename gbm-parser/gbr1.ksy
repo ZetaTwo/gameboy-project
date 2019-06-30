@@ -78,8 +78,33 @@ types:
 
     object_map_tile_data:
       seq:
-        - id: dummy
+        - id: master_id
+          type: u2
+        - id: data
+          type: object_map_tile_data_record
+          repeat: expr
+          repeat-expr: master.tile_count
+      instances:
+        master:
           size: 0
+          process: find_master(master_id)
+
+    object_map_tile_data_record:
+      seq:
+        - id: flipped_vertically
+          type: b1
+        - id: flipped_horizontally
+          type: b1
+        - id: reserved1
+          type: b3
+        - id: sgb_palette
+          type: b3
+        - id: reserved2
+          type: b1
+        - id: gbc_palette
+          type: b5
+        - id: tile_number
+          type: b10
 
     object_map_properties:
       seq:

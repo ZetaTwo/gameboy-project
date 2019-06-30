@@ -1,0 +1,1 @@
+Complete (nice) implementation depends on https://github.com/kaitai-io/kaitai_struct/issues/172
