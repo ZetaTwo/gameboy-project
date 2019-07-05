@@ -1,0 +1,3 @@
+[submodule "gbgenie"]
+	path = gbgenie
+	url = git@github.com:ZetaTwo/gbgenie.git
