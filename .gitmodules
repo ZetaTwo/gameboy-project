@@ -1,3 +1,6 @@
 [submodule "gbgenie"]
 	path = gbgenie
 	url = git@github.com:ZetaTwo/gbgenie.git
+[submodule "gbparse"]
+	path = gbparse
+	url = git@github.com:ZetaTwo/gbparse.git
