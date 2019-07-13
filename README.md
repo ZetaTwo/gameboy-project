@@ -1,12 +1,13 @@
 # Gameboy Project
 
-## Various notes
+This repository contains tools and files for hacking on the Game Boy.
+The idea is to create a framework to for scripted analysis including emulation to allow for fuzzing and symbolic execution of Game Boy ROMs.
 
-http://www.devrs.com/gb/hmgd/gbmb.html  
-http://www.devrs.com/gb/hmgd/gbtd.html  
+## Docs
 
-http://bgb.bircd.org/pandocs.htm#cpuregistersandflags  
-https://gekkio.fi/files/gb-docs/gbctr.pdf  
-https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html  
+We have gathered some documentation in the [docs](/docs/README.md).
 
-https://github.com/angr/angr-platforms/tree/master/tutorial
+## Authors
+
+- [Calle "Zeta Two" Svensson](https://github.com/ZetaTwo)
+- [b0bb](https://github.com/0xb0bb)
