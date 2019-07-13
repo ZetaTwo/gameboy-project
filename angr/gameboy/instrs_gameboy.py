@@ -40,8 +40,6 @@ class GameboyInstruction(Instruction):
         #pylint: disable=unused-argument,no-self-use
         return None
 
-    # Some common stuff we use around
-
     def get_f(self):
         return self.get('f', Type.int_8)
 
@@ -85,10 +83,10 @@ class GameboyInstruction(Instruction):
         Compute the flags touched by each instruction
         and store them in the status register
         """
-        z = self.zero(*args)
-        n = self.negative(*args)
-        h = self.half_carry(*args) # pylint: disable=assignment-from-no-return,assignment-from-none
-        c = self.carry(*args) # pylint: disable=assignment-from-no-return,assignment-from-none
+        z = self.zero(*args) # pylint: disable=assignment-from-none
+        n = self.negative(*args) # pylint: disable=assignment-from-none
+        h = self.half_carry(*args) # pylint: disable=assignment-from-none
+        c = self.carry(*args) # pylint: disable=assignment-from-none
         
         self.set_flags(z, n, h, c)
 
@@ -106,268 +104,6 @@ class GameboyInstruction(Instruction):
             if flag:
                 freg = freg & ~(1 << offset) | (flag.cast_to(Type.int_8) << offset).cast_to(freg.ty)
         self.put_f(freg)
-
-    ##
-    ## Functions for dealing with MSP430's complex addressing modes
-    ##
-
-    def decorate_src(self, src_bits, mode_bits, imm_bits):
-        """
-        Computes the decorated source operand for disassembly
-        """
-
-        """
-        src = ArchMSP430.register_index[int(src_bits, 2)]
-        src_mode = int(mode_bits, 2)
-        # Load the immediate word
-        src_imm = None
-        if imm_bits:
-            src_imm = bits_to_signed_int(imm_bits)
-        # Symbolic and Immediate modes use the PC as the source.
-        if src == 'pc':
-            if src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.SYMBOLIC_MODE
-            elif src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-                src_mode = ArchMSP430.Mode.IMMEDIATE_MODE
-        # Resolve the constant generator stuff.
-        elif src == 'cg':
-            if src_mode == ArchMSP430.Mode.REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE0
-            elif src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE1
-            elif src_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE2
-            else:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE_NEG1
-        # If you use the SR as the source. things get weird.
-        elif src == 'sr':
-            if src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.ABSOLUTE_MODE
-            elif src_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE4
-            elif src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE8
-        # Fetch constants
-        if src_mode == ArchMSP430.Mode.CONSTANT_MODE0:
-            src_str = "#0"
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE1:
-            src_str = "#1"
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE2:
-            src_str = "#2"
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE4:
-            src_str = "#4"
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE8:
-            src_str = "#8"
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE_NEG1:
-            src_str = "#-1"
-        # Fetch immediate.
-        elif src_mode == ArchMSP430.Mode.IMMEDIATE_MODE:
-            src_str = str(bits_to_signed_int(imm_bits))
-        # Symbolic mode: Add the immediate to the PC
-        elif src_mode == ArchMSP430.Mode.SYMBOLIC_MODE:
-            src_str = "%s+%d" % (src, bits_to_signed_int(imm_bits))
-        else:
-            # Register mode can write-out to the source for one-operand, so set the writeout
-            src_str = self.decorate_reg(src, src_mode, src_imm)
-        return src_str
-        """
-
-    def fetch_src(self, src_bits, mode_bits, imm_bits, ty):
-        """
-        Fetch the ``source'' operand of an instruction.
-        Returns the source as a VexValue, and, if it exists, a function for how it can be written
-        to if needed (e.g., one-operand instructions)
-        :param src_bits: bit-string of the src
-        :param mode_bits: bit-string of the mode
-        :param imm_bits: bit-string of the immediate
-        :param ty: The type to use (the byte type or word type)
-        :return: The src as a VexValue, and a lambda describing how to write to it if necessary
-        """
-
-        """
-        src_num = int(src_bits, 2)
-        src_name = ArchMSP430.register_index[src_num]
-        src_mode = int(mode_bits, 2)
-        writeout = None
-        # Load the immediate word
-        src_imm = None
-        if imm_bits:
-            src_imm = bits_to_signed_int(imm_bits)
-        # Symbolic and Immediate modes use the PC as the source.
-        if src_name == 'pc':
-            if src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.SYMBOLIC_MODE
-            elif src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-                src_mode = ArchMSP430.Mode.IMMEDIATE_MODE
-        # Resolve the constant generator stuff.
-        elif src_name == 'cg':
-            if src_mode == ArchMSP430.Mode.REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE0
-            elif src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE1
-            elif src_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE2
-            else:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE_NEG1
-        # If you use the SR as the source. things get weird.
-        elif src_name == 'sr':
-            if src_mode == ArchMSP430.Mode.INDEXED_MODE:
-                src_mode = ArchMSP430.Mode.ABSOLUTE_MODE
-            elif src_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE4
-            elif src_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-                src_mode = ArchMSP430.Mode.CONSTANT_MODE8
-        # Fetch constants
-        if src_mode == ArchMSP430.Mode.CONSTANT_MODE0:
-            src_vv = self.constant(0, ty)
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE1:
-            src_vv = self.constant(1, ty)
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE2:
-            src_vv = self.constant(2, ty)
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE4:
-            src_vv = self.constant(4, ty)
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE8:
-            src_vv = self.constant(8, ty)
-        elif src_mode == ArchMSP430.Mode.CONSTANT_MODE_NEG1:
-            src_vv = self.constant(-1, ty)
-        # Fetch immediate.
-        elif src_mode == ArchMSP430.Mode.IMMEDIATE_MODE:
-            src_vv = self.constant(bits_to_signed_int(imm_bits), ty)
-        # Symbolic mode: Add the immediate to the PC
-        elif src_mode == ArchMSP430.Mode.SYMBOLIC_MODE:
-            src_vv = self.get(src_num, Type.int_16) + bits_to_signed_int(imm_bits) + 2
-        else:
-            # Register mode can write-out to the source for one-operand, so set the writeout
-            src_vv, writeout = self.fetch_reg(src_num, src_mode, src_imm, ty)
-        return src_vv, writeout
-        """
-
-    def decorate_dst(self, dst_bits, mode_bits, imm_bits):
-        """
-        Computes the decorated destination operand for disassembly
-        """
-
-        """
-        dst = ArchMSP430.register_index[int(dst_bits, 2)]
-        dst_mode = int(mode_bits, 2)
-        dst_imm = None
-        # Using sr as the dst enables "absolute addressing"
-        if dst == 'sr' and dst_mode == ArchMSP430.Mode.INDEXED_MODE:
-            dst_mode = ArchMSP430.Mode.ABSOLUTE_MODE
-        if imm_bits:
-            dst_imm = bits_to_signed_int(imm_bits)
-
-        # two-op instructions always have a dst
-        dst_str = self.decorate_reg(dst, dst_mode, dst_imm)
-        # val = val.cast_to(ty)
-        return dst_str
-        """
-
-    def fetch_dst(self, dst_bits, mode_bits, imm_bits, ty):
-        """
-        Fetch the destination argument.
-        :param dst_bits:
-        :param mode_bits:
-        :param imm_bits:
-        :param ty:
-        :return: The VexValue representing the destination, and the writeout function for it
-        """
-
-        """
-        dst_num = int(dst_bits, 2)
-        dst_name = ArchMSP430.register_index[dst_num]
-        dst_mode = int(mode_bits, 2)
-        dst_imm = None
-        # Using sr as the dst enables "absolute addressing"
-        if dst_name == 'sr' and dst_mode == ArchMSP430.Mode.INDEXED_MODE:
-            dst_mode = ArchMSP430.Mode.ABSOLUTE_MODE
-        if imm_bits:
-            dst_imm = int(imm_bits, 2)
-
-        # two-op instructions always have a dst and a writeout
-        val, writeout = self.fetch_reg(dst_num, dst_mode, dst_imm, ty)
-        # val = val.cast_to(ty)
-        return val, writeout
-        """
-
-    def decorate_reg(self, reg_name, reg_mode, imm):
-        # pylint: disable=no-self-use
-        """
-        Decorate the register argument used for disassembly
-        """
-
-        """
-        # Boring register mode.  A write is just a Put.
-        if reg_mode == ArchMSP430.Mode.REGISTER_MODE:
-            reg_str = reg_name
-        # Indexed mode, add the immediate to the register
-        elif reg_mode == ArchMSP430.Mode.INDEXED_MODE:
-            reg_str = "%d(%s)" % (imm, reg_name)
-        # Indirect mode; fetch address in register; store is a write there.
-        elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-            reg_str = "@%s" % reg_str
-        # Indirect Autoincrement mode. Increment the register by the type size, then access it
-        elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-            reg_str = "@%s+" % reg_name
-        elif reg_mode == ArchMSP430.Mode.ABSOLUTE_MODE:
-            reg_str = imm
-        else:
-            raise Exception('Unknown mode found')
-        return reg_str
-        """
-
-    def fetch_reg(self, reg_num, reg_mode, imm, ty):
-        """
-        Resolve the operand for register-based modes.
-        :param reg_num: The Register Number
-        :param reg_mode: The Register Mode
-        :param imm: The immediate word, if any
-        :param ty: The Type (byte or word)
-        :return: The VexValue of the operand, and the writeout function, if any.
-        """
-
-        """
-        # Boring register mode.  A write is just a Put.
-        if reg_mode == ArchMSP430.Mode.REGISTER_MODE:
-            # Fetch the register
-            reg_vv = self.get(reg_num, ty)
-            val = reg_vv
-            writeout = lambda v: self.put(v.cast_to(REGISTER_TYPE), reg_num)
-        # Indexed mode, add the immediate to the register
-        # A write here is a store to reg + imm
-        elif reg_mode == ArchMSP430.Mode.INDEXED_MODE:
-            # Fetch the register
-            reg_vv = self.get(reg_num, REGISTER_TYPE)
-            addr_val = reg_vv + imm
-            val = self.load(addr_val, ty)
-            writeout = lambda v: self.store(v, addr_val)
-        # Indirect mode; fetch address in register; store is a write there.
-        elif reg_mode == ArchMSP430.Mode.INDIRECT_REGISTER_MODE:
-            # Fetch the register
-            reg_vv = self.get(reg_num, REGISTER_TYPE)
-            val = self.load(reg_vv, ty)
-            writeout = lambda v: self.store(v, reg_vv)
-        # Indirect Autoincrement mode. Increment the register by the type size, then access it
-        elif reg_mode == ArchMSP430.Mode.INDIRECT_AUTOINCREMENT_MODE:
-            if ty == Type.int_16:
-                incconst = self.constant(2, REGISTER_TYPE)
-            else:
-                incconst = self.constant(1, REGISTER_TYPE)
-            # Fetch the register
-            reg_vv = self.get(reg_num, REGISTER_TYPE)
-            # Do the increment, now
-            self.put(reg_vv + incconst, reg_num)
-            # Now load it.
-            val = self.load(reg_vv, ty)
-            writeout = lambda v: self.store(v, reg_num)
-        elif reg_mode == ArchMSP430.Mode.ABSOLUTE_MODE:
-            imm_vv = self.constant(imm, REGISTER_TYPE)
-            val = self.load(imm_vv, ty)
-            writeout = lambda v: self.store(v, imm_vv)
-        else:
-            raise Exception('Unknown mode found')
-        return val, writeout
-        """
 
     # The TypeXInstruction classes will do this.
     @abc.abstractmethod
@@ -658,35 +394,10 @@ class Instruction_ld17(GameboyInstruction):
     name = 'ld'
 """
 
-"""
-class Instruction_ld2(GameboyInstruction):
-    bin_format = format(0x02, '08b')
-    name = 'ld'
-class Instruction_ld8(GameboyInstruction):
-    bin_format = format(0x12, '08b')
-    name = 'ld'
-class Instruction_ld13(GameboyInstruction):
-    bin_format = format(0x22, '08b')
-    name = 'ld'
-class Instruction_ld18(GameboyInstruction):
-    bin_format = format(0x32, '08b')
-    name = 'ld'
-"""
 
-"""
-class Instruction_ld3(GameboyInstruction):
-    bin_format = format(0x06, '08b') + 'x'*8
+class Instruction_ld_indirect(GameboyInstruction):
+    bin_format = '00rrd010'
     name = 'ld'
-class Instruction_ld9(GameboyInstruction):
-    bin_format = format(0x16, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld14(GameboyInstruction):
-    bin_format = format(0x26, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld19(GameboyInstruction):
-    bin_format = format(0x36, '08b') + 'x'*8
-    name = 'ld'
-"""
 
 """
 class Instruction_ld4(GameboyInstruction):
@@ -694,35 +405,10 @@ class Instruction_ld4(GameboyInstruction):
     name = 'ld'
 """
 
-"""
-class Instruction_ld5(GameboyInstruction):
-    bin_format = format(0x0a, '08b')
-    name = 'ld'
-class Instruction_ld10(GameboyInstruction):
-    bin_format = format(0x1a, '08b')
-    name = 'ld'
-class Instruction_ld15(GameboyInstruction):
-    bin_format = format(0x2a, '08b')
-    name = 'ld'
-class Instruction_ld20(GameboyInstruction):
-    bin_format = format(0x3a, '08b')
-    name = 'ld'
-"""
 
-"""
-class Instruction_ld6(GameboyInstruction):
-    bin_format = format(0x0e, '08b') + 'x'*8
+class Instruction_ld_imm(GameboyInstruction):
+    bin_format = '00rrr110'
     name = 'ld'
-class Instruction_ld11(GameboyInstruction):
-    bin_format = format(0x1e, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld16(GameboyInstruction):
-    bin_format = format(0x2e, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld21(GameboyInstruction):
-    bin_format = format(0x3e, '08b') + 'x'*8
-    name = 'ld'
-"""
 
 class Instruction_halt(GameboyInstruction):
     bin_format = '01110110' # 0x76: ld (hl) (hl)
