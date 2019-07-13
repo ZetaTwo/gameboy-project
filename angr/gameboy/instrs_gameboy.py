@@ -479,3 +479,69 @@ class Instruction_ld(GameboyInstruction):
     bin_format = format(0xfa, '08b') + 'x'*16
     name = 'ld'
 """
+
+# Instruction block: 11001011 00000xxx
+# Count: 8 instructions
+class Instruction_RLC(GameboyInstruction):
+    bin_format = '11001011 00000rrr'
+    name = 'RLC r8'
+
+# Instruction block: 11001011 00001xxx
+# Count: 8 instructions
+class Instruction_RRC(GameboyInstruction):
+    bin_format = '11001011 00001rrr'
+    name = 'RRC r8'
+
+# Instruction block: 11001011 00010xxx
+# Count: 8 instructions
+class Instruction_RL(GameboyInstruction):
+    bin_format = '11001011 00010rrr'
+    name = 'RL r8'
+
+# Instruction block: 11001011 00011xxx
+# Count: 8 instructions
+class Instruction_RR(GameboyInstruction):
+    bin_format = '11001011 00011rrr'
+    name = 'RR r8'
+
+# Instruction block: 11001011 00100xxx
+# Count: 8 instructions
+class Instruction_SLA(GameboyInstruction):
+    bin_format = '11001011 00100rrr'
+    name = 'SLA r8'
+
+# Instruction block: 11001011 00101xxx
+# Count: 8 instructions
+class Instruction_SRA(GameboyInstruction):
+    bin_format = '11001011 00101rrr'
+    name = 'SRA r8'
+
+# Instruction block: 11001011 00110xxx
+# Count: 8 instructions
+class Instruction_SWAP(GameboyInstruction):
+    bin_format = '11001011 00110rrr'
+    name = 'SWAP r8'
+
+# Instruction block: 11001011 00111xxx
+# Count: 8 instructions
+class Instruction_SRL(GameboyInstruction):
+    bin_format = '11001011 00111rrr'
+    name = 'SRL r8'
+
+# Instruction block: 11001011 01xxxxxx
+# Count: 64 instructions
+class Instruction_BIT(GameboyInstruction):
+    bin_format = '11001011 01iiirrr'
+    name = 'BIT x,r8'
+
+# Instruction block: 11001011 10xxxxxx
+# Count: 64 instructions
+class Instruction_RES(GameboyInstruction):
+    bin_format = '11001011 10iiirrr'
+    name = 'RES x,r8'
+
+# Instruction block: 11001011 11xxxxxx
+# Count: 64 instructions
+class Instruction_SET(GameboyInstruction):
+    bin_format = '11001011 11iiirrr'
+    name = 'SET x,r8'
