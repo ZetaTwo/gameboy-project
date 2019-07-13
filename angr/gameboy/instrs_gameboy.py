@@ -161,7 +161,7 @@ class Instruction_JR(GameboyInstruction):
 # Instruction block: 00xx0001
 # Count: 4 instructions
 class Instruction_LD_D16(GameboyInstruction):
-    bin_format = '00rr0001dddddddddddddddd'
+    bin_format = '00rr0001' + 'd'*16
     name = 'LD r16,d16'
 
 # Instruction block: 00xx0010
@@ -191,7 +191,7 @@ class Instruction_DEC_R8(GameboyInstruction):
 # Instruction block: 00xxx110
 # Count: 8 instructions
 class Instruction_LD_D8(GameboyInstruction):
-    bin_format = '00rrr110dddddddd'
+    bin_format = '00rrr110' + 'd'*8
     name = 'LD reg,d8'
 
 # Instruction block: 000xx111
@@ -301,8 +301,8 @@ class Instruction_POP_R16(GameboyInstruction):
 # Instruction block: 110xx010
 # Count: 4 instructions
 class Instruction_JP_flag(GameboyInstruction):
-    bin_format = '110ff010aaaaaaaaaaaaaaaa'
-    name = 'JP f'
+    bin_format = '110ff010' + 'a'*16
+    name = 'JP f,a16'
 
     def disassemble(self):
         return self.addr, self.name, [self.data['a']]
@@ -321,12 +321,30 @@ class Instruction_JP_flag(GameboyInstruction):
         else:
             raise ValueError('Variant %d not supported' % flag)
 
-# TODO: 0xC3, CD
+# Instruction block: 11000011
+# Count: 1 instructions
+class Instruction_JP(GameboyInstruction):
+    bin_format = '11000011' + 'a'*16
+    name = 'JP a16'
+
+    def compute_result(self, *args):
+        dst = bits_to_le16(self.data['a'])
+        self.jump(None, dst)
+
+# Instruction block: 11001101
+# Count: 1 instructions
+class Instruction_CALL(GameboyInstruction):
+    bin_format = '11001101' + 'a'*16
+    name = 'CALL a16'
+
+    def compute_result(self, *args):
+        dst = bits_to_le16(self.data['a'])
+        self.jump(None, dst, jumpkind=JumpKind.Call)
 
 # Instruction block: 110xx100
 # Count: 4 instructions
 class Instruction_CALL_flag(GameboyInstruction):
-    bin_format = '110ff100aaaaaaaaaaaaaaaa'
+    bin_format = '110ff100' + 'a'*16
     name = 'CALL f,a16'
 
     def disassemble(self):
@@ -336,13 +354,13 @@ class Instruction_CALL_flag(GameboyInstruction):
         dst = bits_to_le16(self.data['a'])
         flag = int(self.data['f'], 2)
         if flag == 0:
-            self.jump(self.get_zero() == 0, dst, jumpkind=JumpKind.call)
+            self.jump(self.get_zero() == 0, dst, jumpkind=JumpKind.Call)
         elif flag == 1:
-            self.jump(self.get_zero() == 1, dst, jumpkind=JumpKind.call)
+            self.jump(self.get_zero() == 1, dst, jumpkind=JumpKind.Call)
         elif flag == 2:
-            self.jump(self.get_carry() == 0, dst, jumpkind=JumpKind.call)
+            self.jump(self.get_carry() == 0, dst, jumpkind=JumpKind.Call)
         elif flag == 3:
-            self.jump(self.get_carry() == 1, dst, jumpkind=JumpKind.call)
+            self.jump(self.get_carry() == 1, dst, jumpkind=JumpKind.Call)
         else:
             raise ValueError('Variant %d not supported' % flag)
 
@@ -352,13 +370,17 @@ class Instruction_PUSH(GameboyInstruction):
     bin_format = '11ss0101'
     name = 'PUSH'
 
-# TODO: <op> A,d8
-
 # Instruction block: 11xxx111
 # Count: 8 instructions
 class Instruction_RST(GameboyInstruction):
     bin_format = '11hhh111'
     name = 'RST'
+
+# Instruction block: 110x1001
+# Count: 2 instructions
+class Instruction_RET(GameboyInstruction):
+    bin_format = '110v1001'
+    name = 'RET'
 
 # Instruction block: 11xxx110
 # Count: 8 instructions
@@ -366,141 +388,128 @@ class Instruction_OP_D8(GameboyInstruction):
     bin_format = '11ooo110'
     name = 'ARITH d8'
 
-# TODO: Unorganized below
+# Instruction block: 11110011
+# Count: 1 instructions
+class Instruction_DI(GameboyInstruction):
+    bin_format = '11110011'
+    name = 'DI'
 
+# Instruction block: 11111011
+# Count: 1 instructions
+class Instruction_EI(GameboyInstruction):
+    bin_format = '11111011'
+    name = 'EI'
 
-class Instruction_JPHL(GameboyInstruction):
-    bin_format = format(0xE9, '08b')
-    name = 'jphl'
+# Instruction block: 11101001
+# Count: 1 instructions
+class Instruction_ADD_SP_R8(GameboyInstruction):
+    bin_format = '11101001' + 'd'*8
+    name = 'ADD SP,s8'
+
+# Instruction block: 11101001
+# Count: 1 instructions
+class Instruction_JP_HL(GameboyInstruction):
+    bin_format = '11101001'
+    name = 'JP (HL)'
 
     def disassemble(self):
         return self.addr, self.name, [self.data['a']]
 
     def compute_result(self, *args):
-        self.jump(None, self.get('hl', Type.int_16))
+        self.jump(None, self.get('hl', Type.int_16)) #TODO: incorrect
 
-"""
-class Instruction_ret(GameboyInstruction):
-    bin_format = format(0xc9, '08b')
-    name = 'ret'
+# Instruction block: 11111000
+# Count: 1 instructions
+class Instruction_LD_HL_SP_R8(GameboyInstruction):
+    bin_format = '11111000' + 'd'*8
+    name = 'LD HL,SP+s8'
 
-class Instruction_reti(GameboyInstruction):
-    bin_format = format(0xd9, '08b')
-    name = 'reti'
-"""
+# Instruction block: 11111001
+# Count: 1 instructions
+class Instruction_LD_SP_HL(GameboyInstruction):
+    bin_format = '11111001'
+    name = 'LD SP,HL'
 
+# Instruction block: 111x0000
+# Count: 2 instructions
+class Instruction_LD_ACC_A8(GameboyInstruction):
+    bin_format = '111d0000' + 'a'*8
+    name = 'LD (a8)<->A'
 
+# Instruction block: 111x0010
+# Count: 2 instructions
+class Instruction_LD_RC_ACC(GameboyInstruction):
+    bin_format = '111d0010'
+    name = 'LD (C)<->A'
 
-class Instruction_di(GameboyInstruction):
-    bin_format = format(0xf3, '08b')
-    name = 'di'
-
-class Instruction_ei(GameboyInstruction):
-    bin_format = format(0xfb, '08b')
-    name = 'ei'
-
-"""
-
-class Instruction_add(GameboyInstruction):
-    bin_format = format(0xe8, '08b') + 'x'*8
-    name = 'add'
-
-class Instruction_ld4(GameboyInstruction):
-    bin_format = format(0x08, '08b') + 'x'*16
-    name = 'ld'
-"""
-
-"""
+# Instruction block: 111x1010
+# Count: 2 instructions
 class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xe0, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xe2, '08b')
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xea, '08b') + 'x'*16
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xf0, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xf2, '08b')
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xfa, '08b') + 'x'*16
-    name = 'ld'
-
-
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xf8, '08b') + 'x'*8
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xf9, '08b')
-    name = 'ld'
-"""
+    bin_format = '111d1010' + 'a'*16
+    name = 'LD (a16)<->A'
 
 # Instruction block: 11001011 00000xxx
 # Count: 8 instructions
 class Instruction_RLC(GameboyInstruction):
-    bin_format = '11001011 00000rrr'
+    bin_format = '1100101100000rrr'
     name = 'RLC r8'
 
 # Instruction block: 11001011 00001xxx
 # Count: 8 instructions
 class Instruction_RRC(GameboyInstruction):
-    bin_format = '11001011 00001rrr'
+    bin_format = '1100101100001rrr'
     name = 'RRC r8'
 
 # Instruction block: 11001011 00010xxx
 # Count: 8 instructions
 class Instruction_RL(GameboyInstruction):
-    bin_format = '11001011 00010rrr'
+    bin_format = '1100101100010rrr'
     name = 'RL r8'
 
 # Instruction block: 11001011 00011xxx
 # Count: 8 instructions
 class Instruction_RR(GameboyInstruction):
-    bin_format = '11001011 00011rrr'
+    bin_format = '1100101100011rrr'
     name = 'RR r8'
 
 # Instruction block: 11001011 00100xxx
 # Count: 8 instructions
 class Instruction_SLA(GameboyInstruction):
-    bin_format = '11001011 00100rrr'
+    bin_format = '1100101100100rrr'
     name = 'SLA r8'
 
 # Instruction block: 11001011 00101xxx
 # Count: 8 instructions
 class Instruction_SRA(GameboyInstruction):
-    bin_format = '11001011 00101rrr'
+    bin_format = '1100101100101rrr'
     name = 'SRA r8'
 
 # Instruction block: 11001011 00110xxx
 # Count: 8 instructions
 class Instruction_SWAP(GameboyInstruction):
-    bin_format = '11001011 00110rrr'
+    bin_format = '1100101100110rrr'
     name = 'SWAP r8'
 
 # Instruction block: 11001011 00111xxx
 # Count: 8 instructions
 class Instruction_SRL(GameboyInstruction):
-    bin_format = '11001011 00111rrr'
+    bin_format = '1100101100111rrr'
     name = 'SRL r8'
 
 # Instruction block: 11001011 01xxxxxx
 # Count: 64 instructions
 class Instruction_BIT(GameboyInstruction):
-    bin_format = '11001011 01iiirrr'
+    bin_format = '1100101101iiirrr'
     name = 'BIT x,r8'
 
 # Instruction block: 11001011 10xxxxxx
 # Count: 64 instructions
 class Instruction_RES(GameboyInstruction):
-    bin_format = '11001011 10iiirrr'
+    bin_format = '1100101110iiirrr'
     name = 'RES x,r8'
 
 # Instruction block: 11001011 11xxxxxx
 # Count: 64 instructions
 class Instruction_SET(GameboyInstruction):
-    bin_format = '11001011 11iiirrr'
+    bin_format = '1100101111iiirrr'
     name = 'SET x,r8'
