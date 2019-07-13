@@ -5,7 +5,7 @@ The idea is to create a framework to for scripted analysis including emulation t
 
 ## Docs
 
-We have gathered some documentation in the [docs](/docs/README.md).
+We have gathered some documentation in the [docs](/docs/docs.md).
 
 ## Authors
 
