@@ -231,12 +231,12 @@ class Instruction_DEC_R16(GameboyInstruction):
 
 # Instruction block: 01xxxxxx
 # Count: 1+63 = 64 instructions
-class Instruction_halt(GameboyInstruction):
+class Instruction_HALT(GameboyInstruction):
     bin_format = '01110110' # 0x76: ld (hl) (hl)
-    name = 'halt'
+    name = 'HALT'
 class Instruction_LD_R8_R8(GameboyInstruction):
     bin_format = '01dddsss'
-    name = 'ld reg reg'
+    name = 'LD r8,r8'
 
 # Instruction block: 10000xxx
 # Count: 8 instructions
@@ -258,87 +258,116 @@ class Instruction_SUB_R8(GameboyInstruction):
 
 # Instruction block: 10011xxx
 # Count: 8 instructions
-class Instruction_sbc(GameboyInstruction):
+class Instruction_SBC_R8(GameboyInstruction):
     bin_format = '10011ddd'
     name = 'SBC A,r8'
 
 # Instruction block: 10100xxx
 # Count: 8 instructions
-class Instruction_and(GameboyInstruction):
+class Instruction_AND_R8(GameboyInstruction):
     bin_format = '10100ddd'
     name = 'AND A,r8'
 
 # Instruction block: 10101xxx
 # Count: 8 instructions
-class Instruction_xor(GameboyInstruction):
+class Instruction_XOR_R8(GameboyInstruction):
     bin_format = '10101ddd'
     name = 'XOR A,r8'
 
 # Instruction block: 10110xxx
 # Count: 8 instructions
-class Instruction_or(GameboyInstruction):
+class Instruction_OR_R8(GameboyInstruction):
     bin_format = '10110ddd'
     name = 'OR A,r8'
 
 # Instruction block: 10111xxx
 # Count: 8 instructions
-class Instruction_cp(GameboyInstruction):
+class Instruction_CP_R8(GameboyInstruction):
     bin_format = '10111ddd'
     name = 'CP'
 
+# Instruction block: 110xx000
+# Count: 4 instructions
+class Instruction_RET_flag(GameboyInstruction):
+    bin_format = '110ff000'
+    name = 'RET f'
+
+# Instruction block: 11xx0001
+# Count: 4 instructions
+class Instruction_POP_R16(GameboyInstruction):
+    bin_format = '11ss0001'
+    name = 'POP r16'
+
+# Instruction block: 110xx010
+# Count: 4 instructions
+class Instruction_JP_flag(GameboyInstruction):
+    bin_format = '110ff010aaaaaaaaaaaaaaaa'
+    name = 'JP f'
+
+    def disassemble(self):
+        return self.addr, self.name, [self.data['a']]
+
+    def compute_result(self, *args):
+        dst = bits_to_le16(self.data['a'])
+        flag = int(self.data['f'], 2)
+        if flag == 0:
+            self.jump(self.get_zero() == 0, dst)
+        elif flag == 1:
+            self.jump(self.get_zero() == 1, dst)
+        elif flag == 2:
+            self.jump(self.get_carry() == 0, dst)
+        elif flag == 3:
+            self.jump(self.get_carry() == 1, dst)
+        else:
+            raise ValueError('Variant %d not supported' % flag)
+
+# TODO: 0xC3, CD
+
+# Instruction block: 110xx100
+# Count: 4 instructions
+class Instruction_CALL_flag(GameboyInstruction):
+    bin_format = '110ff100aaaaaaaaaaaaaaaa'
+    name = 'CALL f,a16'
+
+    def disassemble(self):
+        return self.addr, self.name, [self.data['a']]
+
+    def compute_result(self, *args):
+        dst = bits_to_le16(self.data['a'])
+        flag = int(self.data['f'], 2)
+        if flag == 0:
+            self.jump(self.get_zero() == 0, dst, jumpkind=JumpKind.call)
+        elif flag == 1:
+            self.jump(self.get_zero() == 1, dst, jumpkind=JumpKind.call)
+        elif flag == 2:
+            self.jump(self.get_carry() == 0, dst, jumpkind=JumpKind.call)
+        elif flag == 3:
+            self.jump(self.get_carry() == 1, dst, jumpkind=JumpKind.call)
+        else:
+            raise ValueError('Variant %d not supported' % flag)
+
+# Instruction block: 11xx0101
+# Count: 4 instructions
+class Instruction_PUSH(GameboyInstruction):
+    bin_format = '11ss0101'
+    name = 'PUSH'
+
+# TODO: <op> A,d8
+
+# Instruction block: 11xxx111
+# Count: 8 instructions
+class Instruction_RST(GameboyInstruction):
+    bin_format = '11hhh111'
+    name = 'RST'
+
+# Instruction block: 11xxx110
+# Count: 8 instructions
+class Instruction_OP_D8(GameboyInstruction):
+    bin_format = '11ooo110'
+    name = 'ARITH d8'
+
 # TODO: Unorganized below
 
-# Instruction group: jump
-class Instruction_JPNZ(GameboyInstruction):
-    bin_format = format(0xC2, '08b') + 'a'*16
-    name = 'jpnz'
-
-    def disassemble(self):
-        return self.addr, self.name, [self.data['a']]
-
-    def compute_result(self, *args):
-        self.jump(self.get_zero() == 0, bits_to_le16(self.data['a']))
-
-class Instruction_JP(GameboyInstruction):
-    bin_format = format(0xC3, '08b') + 'a'*16
-    name = 'jp'
-
-    def disassemble(self):
-        return self.addr, self.name, [self.data['a']]
-    
-    @abc.abstractmethod
-    def compute_result(self, *args):
-        self.jump(None, bits_to_le16(self.data['a']))
-
-class Instruction_JPZ(GameboyInstruction):
-    bin_format = format(0xCA, '08b') + 'a'*16
-    name = 'jpz'
-
-    def disassemble(self):
-        return self.addr, self.name, [self.data['a']]
-
-    def compute_result(self, *args):
-        self.jump(self.get_zero() == 1, bits_to_le16(self.data['a']))
-
-class Instruction_JPNC(GameboyInstruction):
-    bin_format = format(0xD2, '08b') + 'a'*16
-    name = 'jpnc'
-
-    def disassemble(self):
-        return self.addr, self.name, [self.data['a']]
-
-    def compute_result(self, *args):
-        self.jump(self.get_carry() == 0, bits_to_le16(self.data['a']))
-
-class Instruction_JPC(GameboyInstruction):
-    bin_format = format(0xDA, '08b') + 'a'*16
-    name = 'jpc'
-
-    def disassemble(self):
-        return self.addr, self.name, [self.data['a']]
-
-    def compute_result(self, *args):
-        self.jump(self.get_carry() == 1, bits_to_le16(self.data['a']))
 
 class Instruction_JPHL(GameboyInstruction):
     bin_format = format(0xE9, '08b')
@@ -351,85 +380,15 @@ class Instruction_JPHL(GameboyInstruction):
         self.jump(None, self.get('hl', Type.int_16))
 
 """
-class Instruction_adc(GameboyInstruction):
-    bin_format = format(0xce, '08b') + 'x'*8
-    name = 'adc'
-
-class Instruction_sub(GameboyInstruction):
-    bin_format = format(0xd6, '08b') + 'x'*8
-    name = 'sub'
-
-class Instruction_sbc(GameboyInstruction):
-    bin_format = format(0xde, '08b') + 'x'*8
-    name = 'sbc'
-
-class Instruction_and(GameboyInstruction):
-    bin_format = format(0xe6, '08b') + 'x'*8
-    name = 'and'
-
-class Instruction_xor(GameboyInstruction):
-    bin_format = format(0xee, '08b') + 'x'*8
-    name = 'xor'
-
-class Instruction_or(GameboyInstruction):
-    bin_format = format(0xf6, '08b') + 'x'*8
-    name = 'or'
-
-class Instruction_cp(GameboyInstruction):
-    bin_format = format(0xfe, '08b') + 'x'*8
-    name = 'cp'
-"""
-
-class Instruction_rst(GameboyInstruction):
-    bin_format = '11hhh111'
-    name = 'rst'
-
-class Instruction_push(GameboyInstruction):
-    bin_format = '11ss0101'
-    name = 'push'
-
-class Instruction_call(GameboyInstruction):
-    bin_format = format(0xc4, '08b') + 'x'*16
-    name = 'call'
-"""
-class Instruction_call(GameboyInstruction):
-    bin_format = format(0xcc, '08b') + 'x'*16
-    name = 'call'
-class Instruction_call(GameboyInstruction):
-    bin_format = format(0xcd, '08b') + 'x'*16
-    name = 'call'
-class Instruction_call(GameboyInstruction):
-    bin_format = format(0xd4, '08b') + 'x'*16
-    name = 'call'
-class Instruction_call(GameboyInstruction):
-    bin_format = format(0xdc, '08b') + 'x'*16
-    name = 'call'
-"""
-
-class Instruction_ret(GameboyInstruction):
-    bin_format = format(0xc0, '08b')
-    name = 'ret'
-"""
-class Instruction_ret(GameboyInstruction):
-    bin_format = format(0xc8, '08b')
-    name = 'ret'
 class Instruction_ret(GameboyInstruction):
     bin_format = format(0xc9, '08b')
     name = 'ret'
-class Instruction_ret(GameboyInstruction):
-    bin_format = format(0xd0, '08b')
-    name = 'ret'
-class Instruction_ret(GameboyInstruction):
-    bin_format = format(0xd8, '08b')
-    name = 'ret'
+
 class Instruction_reti(GameboyInstruction):
     bin_format = format(0xd9, '08b')
     name = 'reti'
 """
 
-class Instruction_pop16(GameboyInstruction):
-    bin_format = '11ss0001'
-    name = 'pop'
 
 
 class Instruction_di(GameboyInstruction):
@@ -441,9 +400,7 @@ class Instruction_ei(GameboyInstruction):
     name = 'ei'
 
 """
-class Instruction_add(GameboyInstruction):
-    bin_format = format(0xc6, '08b') + 'x'*8
-    name = 'add'
+
 class Instruction_add(GameboyInstruction):
     bin_format = format(0xe8, '08b') + 'x'*8
     name = 'add'
@@ -470,13 +427,15 @@ class Instruction_ld(GameboyInstruction):
     bin_format = format(0xf2, '08b')
     name = 'ld'
 class Instruction_ld(GameboyInstruction):
+    bin_format = format(0xfa, '08b') + 'x'*16
+    name = 'ld'
+
+
+class Instruction_ld(GameboyInstruction):
     bin_format = format(0xf8, '08b') + 'x'*8
     name = 'ld'
 class Instruction_ld(GameboyInstruction):
     bin_format = format(0xf9, '08b')
-    name = 'ld'
-class Instruction_ld(GameboyInstruction):
-    bin_format = format(0xfa, '08b') + 'x'*16
     name = 'ld'
 """
 

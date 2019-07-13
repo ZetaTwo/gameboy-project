@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 import angr
 from gameboy import arch_gameboy, load_gameboy, simos_gameboy, lift_gameboy
