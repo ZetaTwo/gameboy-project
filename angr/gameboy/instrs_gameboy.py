@@ -191,11 +191,19 @@ class Instruction_LD_D16(GameboyInstruction):
     bin_format = '00rr0001' + 'd'*16
     name = 'LD r16,d16'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 00xx0010
 # Count: 4 instructions
 class Instruction_LD_REG16(GameboyInstruction):
     bin_format = '00rrd010'
     name = 'LD (r16),A'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 00xx0011
 # Count: 4 instructions
@@ -203,17 +211,29 @@ class Instruction_INC_R16(GameboyInstruction):
     bin_format = '00ss0011'
     name = 'INC r16'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 00xxx100
 # Count: 8 instructions
 class Instruction_INC_R8(GameboyInstruction):
     bin_format = '00ddd100'
     name = 'INC r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 00xxx101
 # Count: 8 instructions
 class Instruction_DEC_R8(GameboyInstruction):
     bin_format = '00ddd101'
     name = 'DEC r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 00xxx110
 # Count: 8 instructions
@@ -227,26 +247,53 @@ class Instruction_RA(GameboyInstruction):
     bin_format = '000vv111'
     name = 'R[LR](C)A'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 000xx111
 # Count: 4 instructions
 class Instruction_DAA(GameboyInstruction):
     bin_format = '00100111'
     name = 'DAA'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 class Instruction_CPL(GameboyInstruction):
     bin_format = '00101111'
     name = 'CPL'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 class Instruction_SCF(GameboyInstruction):
     bin_format = '00110111'
     name = 'SCF'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 class Instruction_CCF(GameboyInstruction):
     bin_format = '00111111'
     name = 'CCF'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 00xx1001
 # Count: 4 instructions
 class Instruction_ADD_R16(GameboyInstruction):
     bin_format = '00ss1001'
     name = 'ADD HL,r16'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # TODO: 0x0A, 0x1A, 0x2A, 0x3A
 
@@ -255,6 +302,10 @@ class Instruction_ADD_R16(GameboyInstruction):
 class Instruction_DEC_R16(GameboyInstruction):
     bin_format = '00ss1011'
     name = 'DEC r16'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 01xxxxxx
 # Count: 1+63 = 64 instructions
@@ -281,11 +332,19 @@ class Instruction_ADD_R8(GameboyInstruction):
     bin_format = '10000sss'
     name = 'ADD A,r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 10001xxx
 # Count: 8 instructions
 class Instruction_ADC_R8(GameboyInstruction):
     bin_format = '10001ddd'
     name = 'ADC A,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10010xxx
 # Count: 8 instructions
@@ -293,11 +352,19 @@ class Instruction_SUB_R8(GameboyInstruction):
     bin_format = '10010ddd'
     name = 'SUB A,r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 10011xxx
 # Count: 8 instructions
 class Instruction_SBC_R8(GameboyInstruction):
     bin_format = '10011ddd'
     name = 'SBC A,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10100xxx
 # Count: 8 instructions
@@ -305,11 +372,19 @@ class Instruction_AND_R8(GameboyInstruction):
     bin_format = '10100ddd'
     name = 'AND A,r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 10101xxx
 # Count: 8 instructions
 class Instruction_XOR_R8(GameboyInstruction):
     bin_format = '10101ddd'
     name = 'XOR A,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10110xxx
 # Count: 8 instructions
@@ -317,11 +392,19 @@ class Instruction_OR_R8(GameboyInstruction):
     bin_format = '10110ddd'
     name = 'OR A,r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 10111xxx
 # Count: 8 instructions
 class Instruction_CP_R8(GameboyInstruction):
     bin_format = '10111ddd'
     name = 'CP'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 110xx000
 # Count: 4 instructions
@@ -329,11 +412,19 @@ class Instruction_RET_flag(GameboyInstruction):
     bin_format = '110ff000'
     name = 'RET f'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11xx0001
 # Count: 4 instructions
 class Instruction_POP_R16(GameboyInstruction):
     bin_format = '11ss0001'
     name = 'POP r16'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 110xx010
 # Count: 4 instructions
@@ -407,11 +498,19 @@ class Instruction_PUSH(GameboyInstruction):
     bin_format = '11ss0101'
     name = 'PUSH'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11xxx111
 # Count: 8 instructions
 class Instruction_RST(GameboyInstruction):
     bin_format = '11hhh111'
     name = 'RST'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 110x1001
 # Count: 2 instructions
@@ -419,11 +518,19 @@ class Instruction_RET(GameboyInstruction):
     bin_format = '110v1001'
     name = 'RET'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11xxx110
 # Count: 8 instructions
 class Instruction_OP_D8(GameboyInstruction):
     bin_format = '11ooo110'
     name = 'ARITH d8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11110011
 # Count: 1 instructions
@@ -451,6 +558,10 @@ class Instruction_ADD_SP_R8(GameboyInstruction):
     bin_format = '11101001' + 'd'*8
     name = 'ADD SP,s8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11101001
 # Count: 1 instructions
 class Instruction_JP_HL(GameboyInstruction):
@@ -469,11 +580,19 @@ class Instruction_LD_HL_SP_R8(GameboyInstruction):
     bin_format = '11111000' + 'd'*8
     name = 'LD HL,SP+s8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11111001
 # Count: 1 instructions
 class Instruction_LD_SP_HL(GameboyInstruction):
     bin_format = '11111001'
     name = 'LD SP,HL'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 111x0000
 # Count: 2 instructions
@@ -481,11 +600,19 @@ class Instruction_LD_ACC_A8(GameboyInstruction):
     bin_format = '111d0000' + 'a'*8
     name = 'LD (a8)<->A'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 111x0010
 # Count: 2 instructions
 class Instruction_LD_RC_ACC(GameboyInstruction):
     bin_format = '111d0010'
     name = 'LD (C)<->A'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 111x1010
 # Count: 2 instructions
@@ -493,11 +620,19 @@ class Instruction_ld(GameboyInstruction):
     bin_format = '111d1010' + 'a'*16
     name = 'LD (a16)<->A'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 00000xxx
 # Count: 8 instructions
 class Instruction_RLC(GameboyInstruction):
     bin_format = '1100101100000rrr'
     name = 'RLC r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11001011 00001xxx
 # Count: 8 instructions
@@ -505,11 +640,19 @@ class Instruction_RRC(GameboyInstruction):
     bin_format = '1100101100001rrr'
     name = 'RRC r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 00010xxx
 # Count: 8 instructions
 class Instruction_RL(GameboyInstruction):
     bin_format = '1100101100010rrr'
     name = 'RL r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11001011 00011xxx
 # Count: 8 instructions
@@ -517,11 +660,19 @@ class Instruction_RR(GameboyInstruction):
     bin_format = '1100101100011rrr'
     name = 'RR r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 00100xxx
 # Count: 8 instructions
 class Instruction_SLA(GameboyInstruction):
     bin_format = '1100101100100rrr'
     name = 'SLA r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11001011 00101xxx
 # Count: 8 instructions
@@ -529,11 +680,19 @@ class Instruction_SRA(GameboyInstruction):
     bin_format = '1100101100101rrr'
     name = 'SRA r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 00110xxx
 # Count: 8 instructions
 class Instruction_SWAP(GameboyInstruction):
     bin_format = '1100101100110rrr'
     name = 'SWAP r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11001011 00111xxx
 # Count: 8 instructions
@@ -541,11 +700,19 @@ class Instruction_SRL(GameboyInstruction):
     bin_format = '1100101100111rrr'
     name = 'SRL r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 01xxxxxx
 # Count: 64 instructions
 class Instruction_BIT(GameboyInstruction):
     bin_format = '1100101101iiirrr'
     name = 'BIT x,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 11001011 10xxxxxx
 # Count: 64 instructions
@@ -553,8 +720,16 @@ class Instruction_RES(GameboyInstruction):
     bin_format = '1100101110iiirrr'
     name = 'RES x,r8'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
+
 # Instruction block: 11001011 11xxxxxx
 # Count: 64 instructions
 class Instruction_SET(GameboyInstruction):
     bin_format = '1100101111iiirrr'
     name = 'SET x,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        log.warn('Instruction %s semantics not implemented' % self.name)
