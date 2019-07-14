@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 from archinfo.arch import Arch, Register, Endness
 from archinfo.arch import register_arch
 

@@ -1,12 +1,12 @@
+import logging
+log = logging.getLogger(__name__)
+
 import abc
 from .arch_gameboy import ArchGameboy
 from pyvex.lifting.util import Instruction, JumpKind, ParseError, Type
 import bitstring
 from bitstring import Bits
 import struct
-
-import logging
-log = logging.getLogger(__name__)
 
 ZERO_BIT_IND = 7
 NEGATIVE_BIT_IND = 6
@@ -574,10 +574,10 @@ class Instruction_EI(GameboyInstruction):
     def compute_result(self, *args):
         self.put(self.constant(1, Type.int_8), self.constant(0xFFFF, Type.int_16))
 
-# Instruction block: 11101001
+# Instruction block: 11101000
 # Count: 1 instructions
 class Instruction_ADD_SP_R8(GameboyInstruction):
-    bin_format = '11101001' + 'd'*8
+    bin_format = '11101000' + 'd'*8
     name = 'ADD SP,s8'
 
     @abc.abstractmethod

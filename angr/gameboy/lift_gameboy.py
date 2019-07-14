@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger(__name__)
+
 from .arch_gameboy import ArchGameboy
 from . import instrs_gameboy as instrs
 from pyvex.lifting import register
