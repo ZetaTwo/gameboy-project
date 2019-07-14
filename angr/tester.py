@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 import angr
 from gameboy import arch_gameboy, load_gameboy, simos_gameboy, lift_gameboy
@@ -9,9 +9,11 @@ proj = angr.Project('../roms/gb-calc.gb', load_options={'rebase_granularity': 8}
 
 addrs = [0x100, 0x150, 0x161, 0x164, 0x16d, 0x176, 0x4853, 0x485d]
 
+
 for addr in addrs:
     block4 = proj.factory.block(addr)
     block4.vex.pp()
+
 
 """
 print(block1.next)

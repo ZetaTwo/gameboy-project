@@ -9,18 +9,18 @@ class ArchGameboy(Arch):
 
     memory_endness = Endness.LE
     register_list = [
+        Register(name='af', size=16,  vex_offset=0 ),
         Register(name='a',  size=8,   vex_offset=0 ),
         Register(name='f',  size=8,   vex_offset=8 ),
-        Register(name='af', size=16,  vex_offset=0 ),
+        Register(name='bc', size=16,  vex_offset=16),
         Register(name='b',  size=8,   vex_offset=16),
         Register(name='c',  size=8,   vex_offset=24),
-        Register(name='bc', size=16,  vex_offset=16),
+        Register(name='de', size=16,  vex_offset=32),
         Register(name='d',  size=8,   vex_offset=32),
         Register(name='e',  size=8,   vex_offset=40),
-        Register(name='de', size=16,  vex_offset=32),
+        Register(name='hl', size=16,  vex_offset=48),
         Register(name='h',  size=8,   vex_offset=48),
         Register(name='l',  size=8,   vex_offset=56),
-        Register(name='hl', size=16,  vex_offset=48),
         Register(name='sp', size=16,  vex_offset=64),
         Register(name='pc', size=16,  vex_offset=80),
         Register(name='ip', size=16,  vex_offset=80), # Alias

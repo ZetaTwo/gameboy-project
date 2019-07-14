@@ -17,6 +17,7 @@ CARRY_BIT_IND = 4
 
 class GameboyInstruction(Instruction):
     opcode = None
+    BIG_REGS = ['bc', 'de', 'hl', 'af']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -74,6 +75,23 @@ class GameboyInstruction(Instruction):
         return True
     """
 
+    SMALL_REGS = ['b','c','d','e','h','l','hl','a']
+    def get_r8_val(self, bits):
+        reg_idx = int(bits, 2)
+        if reg_idx == 6:
+            addr = self.get(self.SMALL_REGS[reg_idx], Type.int_16)
+            return self.load(addr, Type.int_8)
+        else:
+            return self.get(self.SMALL_REGS[reg_idx], Type.int_8)
+    
+    def put_r8_val(self, bits, val):
+        reg_idx = int(bits, 2)
+        if reg_idx == 6:
+            addr = self.get(self.SMALL_REGS[reg_idx], Type.int_16)
+            return self.store(val, addr)
+        else:
+            return self.put(val, self.SMALL_REGS[reg_idx])
+
     def parse(self, bitstrm):
         return  Instruction.parse(self, bitstrm)
 
@@ -122,19 +140,28 @@ class Instruction_NOP(GameboyInstruction):
     bin_format = '00000000'
     name = 'NOP'
 
-    def disassemble(self):
-        return self.addr, self.name, []
-
     @abc.abstractmethod
     def compute_result(self, *args):
         pass
+
 class Instruction_STOP(GameboyInstruction):
     """STOP instruction. Note that this is 1 byte and not 2."""
     bin_format = '00010000'
     name = 'STOP'
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        self.jump(None, 0x10000, JumpKind.Exit)
+
 class Instruction_LD_A16_SP(GameboyInstruction):
-    bin_format = '00001000'
+    bin_format = '00001000' + 'a'*16
     name = 'LD (a16),SP'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        addr = bits_to_le16(self.data['a'])
+        sp = self.get('sp', Type.int_8)
+        self.put(sp, addr, Type.int_8)
+
 class Instruction_JR(GameboyInstruction):
     bin_format = '00vvv000aaaaaaaa'
     name = 'JR'
@@ -234,9 +261,19 @@ class Instruction_DEC_R16(GameboyInstruction):
 class Instruction_HALT(GameboyInstruction):
     bin_format = '01110110' # 0x76: ld (hl) (hl)
     name = 'HALT'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        self.jump(None, 0x10000, JumpKind.Exit)
+
 class Instruction_LD_R8_R8(GameboyInstruction):
     bin_format = '01dddsss'
     name = 'LD r8,r8'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        val = self.get_r8_val(self.data['s'])
+        self.put_r8_val(self.data['d'], val)
 
 # Instruction block: 10000xxx
 # Count: 8 instructions
@@ -394,11 +431,19 @@ class Instruction_DI(GameboyInstruction):
     bin_format = '11110011'
     name = 'DI'
 
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        self.store(self.constant(0, Type.int_8), self.constant(0xFFFF, Type.int_16))
+
 # Instruction block: 11111011
 # Count: 1 instructions
 class Instruction_EI(GameboyInstruction):
     bin_format = '11111011'
     name = 'EI'
+
+    @abc.abstractmethod
+    def compute_result(self, *args):
+        self.put(self.constant(1, Type.int_8), self.constant(0xFFFF, Type.int_16))
 
 # Instruction block: 11101001
 # Count: 1 instructions
