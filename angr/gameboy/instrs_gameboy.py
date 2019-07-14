@@ -334,76 +334,100 @@ class Instruction_ADD_R8(GameboyInstruction):
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val + reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10001xxx
 # Count: 8 instructions
 class Instruction_ADC_R8(GameboyInstruction):
-    bin_format = '10001ddd'
+    bin_format = '10001sss'
     name = 'ADC A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val + reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10010xxx
 # Count: 8 instructions
 class Instruction_SUB_R8(GameboyInstruction):
-    bin_format = '10010ddd'
+    bin_format = '10010sss'
     name = 'SUB A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val - reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10011xxx
 # Count: 8 instructions
 class Instruction_SBC_R8(GameboyInstruction):
-    bin_format = '10011ddd'
+    bin_format = '10011sss'
     name = 'SBC A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val - reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10100xxx
 # Count: 8 instructions
 class Instruction_AND_R8(GameboyInstruction):
-    bin_format = '10100ddd'
+    bin_format = '10100sss'
     name = 'AND A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val & reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10101xxx
 # Count: 8 instructions
 class Instruction_XOR_R8(GameboyInstruction):
-    bin_format = '10101ddd'
+    bin_format = '10101sss'
     name = 'XOR A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val ^ reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10110xxx
 # Count: 8 instructions
 class Instruction_OR_R8(GameboyInstruction):
-    bin_format = '10110ddd'
+    bin_format = '10110sss'
     name = 'OR A,r8'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        self.put(a_val | reg_val, 'a') #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 10111xxx
 # Count: 8 instructions
 class Instruction_CP_R8(GameboyInstruction):
-    bin_format = '10111ddd'
+    bin_format = '10111sss'
     name = 'CP'
 
     @abc.abstractmethod
     def compute_result(self, *args):
+        a_val = self.get('a', Type.int_8)
+        reg_val = self.get_r8_val(self.data['s'])
+        #TODO: flags
         log.warn('Instruction %s semantics not implemented' % self.name)
 
 # Instruction block: 110xx000
