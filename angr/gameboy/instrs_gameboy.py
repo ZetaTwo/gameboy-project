@@ -195,8 +195,8 @@ class Instruction_LD_D16(GameboyInstruction):
     def compute_result(self, *args):
         log.warn('Instruction %s semantics not implemented' % self.name)
 
-# Instruction block: 00xx0010
-# Count: 4 instructions
+# Instruction block: 00xxx010
+# Count: 8 instructions
 class Instruction_LD_REG16(GameboyInstruction):
     bin_format = '00rrd010'
     name = 'LD (r16),A'
@@ -294,8 +294,6 @@ class Instruction_ADD_R16(GameboyInstruction):
     @abc.abstractmethod
     def compute_result(self, *args):
         log.warn('Instruction %s semantics not implemented' % self.name)
-
-# TODO: 0x0A, 0x1A, 0x2A, 0x3A
 
 # Instruction block: 00xx1011
 # Count: 4 instructions
