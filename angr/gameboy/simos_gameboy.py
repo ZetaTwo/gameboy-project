@@ -80,5 +80,5 @@ class SimGameboySyscall(SimCC):
         return state.regs.inout
 
 register_simos('Standalone App', SimGameboy)
-register_syscall_cc('Gameboy', 'default', SimGameboySyscall)
+#register_syscall_cc('Gameboy', 'default', SimGameboySyscall)
 register_default_cc('Gameboy', SimCCGameboy)

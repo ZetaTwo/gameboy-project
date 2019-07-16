@@ -163,14 +163,13 @@ class Instruction_BIT(GameboyInstruction):
     def fetch_operands(self):
         idx = int(self.data['i'], 2)
         reg = self.get_r8_val(self.data['r'])
-        return (idx, reg)
+        return idx, reg
 
-    def compute_result(self, *args):
-        idx, reg = self.fetch_operands()
+    def compute_result(self, idx, reg):
         return reg[idx]
 
-    def commit_result(self, *args):
-        self.put_r8_val(args[-1], self.data['r'])
+    def commit_result(self, res):
+        self.put_r8_val(self.data['r'])(res)
     
     def zero(self, *args):
         return args[-1] == 0
@@ -190,15 +189,14 @@ class Instruction_RES(GameboyInstruction):
     def fetch_operands(self):
         idx = int(self.data['i'], 2)
         reg = self.get_r8_val(self.data['r'])
-        return (idx, reg)
+        return idx, reg
 
-    def compute_result(self, *args):
-        idx, reg = self.fetch_operands()
+    def compute_result(self, idx, reg):
         reg.set_bit(idx, 0)
         return reg
 
-    def commit_result(self, *args):
-        self.put_r8_val(args[-1], self.data['r'])
+    def commit_result(self, res):
+        self.put_r8_val(self.data['r'])(res)
 
 # Instruction block: 11001011 11xxxxxx
 # Count: 64 instructions
@@ -211,10 +209,9 @@ class Instruction_SET(GameboyInstruction):
         reg = self.get_r8_val(self.data['r'])
         return (idx, reg)
 
-    def compute_result(self, *args):
-        idx, reg = self.fetch_operands()
+    def compute_result(self, idx, reg):
         reg.set_bit(idx, 1)
         return reg
 
-    def commit_result(self, *args):
-        self.put_r8_val(args[-1], self.data['r'])
+    def commit_result(self, res):
+        self.put_r8_val(self.data['r'])(res)

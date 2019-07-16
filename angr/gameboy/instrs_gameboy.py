@@ -11,7 +11,6 @@ import struct
 # Reference: https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html
 class GameboyInstruction(Instruction):
     opcode = None
-    BIG_REGS = ['bc', 'de', 'hl', 'af']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -54,20 +53,6 @@ class GameboyInstruction(Instruction):
     def get_half_carry(self):
         return self.get_f()[ArchGameboy.flags['HALF_CARRY']]
 
-    """
-    def commit_result(self, res):
-        #pylint: disable=not-callable
-        if self.commit_func is not None:
-            self.commit_func(res)
-
-    def match_instruction(self, data, bitstrm):
-        # NOTE: The matching behavior for instructions is a "try-them-all-until-it-fits" approach.
-        # Static bits are already checked, so we just look for the opcode.
-        if data['o'] != self.opcode:
-            raise ParseError("Invalid opcode, expected %s, got %s" % (self.opcode, data['o']))
-        return True
-    """
-
     SMALL_REGS = ['b','c','d','e','h','l','hl','a']
     def get_r8_val(self, bits):
         reg_idx = int(bits, 2)
@@ -77,13 +62,48 @@ class GameboyInstruction(Instruction):
         else:
             return self.get(self.SMALL_REGS[reg_idx], Type.int_8)
     
-    def put_r8_val(self, bits, val):
+    def put_r8_val(self, bits):
         reg_idx = int(bits, 2)
         if reg_idx == 6:
             addr = self.get(self.SMALL_REGS[reg_idx], Type.int_16)
-            return self.store(val, addr)
+            return lambda val: self.store(val, addr)
         else:
-            return self.put(val, self.SMALL_REGS[reg_idx])
+            return lambda val: self.put(val, self.SMALL_REGS[reg_idx])
+    
+    BIG_REGS = ['bc', 'de', 'hl', 'sp']
+    def put_r16_val(self, bits):
+        reg_idx = int(bits, 2)
+        return lambda val: self.put(val, self.BIG_REGS[reg_idx])
+    
+    def get_r16_val(self, bits):
+        reg_idx = int(bits, 2)
+        return lambda val: self.get(self.BIG_REGS[reg_idx], Type.int_16)
+
+    def hldi_handling(self, diff):
+        hl = self.get('hl', Type.int_16)
+        hl += diff
+        self.put(hl, 'hl')
+
+    BIG_REGS_2 = ['bc', 'de', 'hl', 'hl']
+    def get_r16_val_2(self, bits):
+        reg_idx = int(bits, 2)
+        value = self.get(self.BIG_REGS_2[reg_idx], Type.int_8)
+        if reg_idx == 2:
+            self.hldi_handling(1)
+        elif reg_idx == 3:
+            self.hldi_handling(-1)
+        return value
+            
+    def put_r16_val_2(self, bits):
+        reg_idx = int(bits, 2)
+        def writer(val):
+            addr = self.get(self.BIG_REGS_2[reg_idx], Type.int_16)
+            self.store(val, addr)
+            if reg_idx == 2:
+                self.hldi_handling(1)
+            elif reg_idx == 3:
+                self.hldi_handling(-1)
+        return writer
 
     def parse(self, bitstrm):
         return  Instruction.parse(self, bitstrm)

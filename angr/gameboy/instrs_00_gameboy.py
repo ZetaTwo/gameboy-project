@@ -15,7 +15,7 @@ class Instruction_NOP(GameboyInstruction):
     bin_format = '00000000'
     name = 'NOP'
 
-    def compute_result(self, *args):
+    def compute_result(self):
         return None
 
 class Instruction_STOP(GameboyInstruction):
@@ -32,17 +32,15 @@ class Instruction_LD_A16_SP(GameboyInstruction):
     name = 'LD (a16),SP'
 
     def fetch_operands(self):
-        addr = bits_to_le16(self.data['a'])
+        self.dst = self.constant(bits_to_le16(self.data['a']), Type.int_16)
         sp = self.get('sp', Type.int_8)
-        return (addr, sp)
+        return self.dst, sp
 
-    def compute_result(self, *args):
-        _, sp = self.fetch_operands()
+    def compute_result(self, dst, sp):
         return sp
 
-    def commit_result(self, *args):
-        addr, _ = self.fetch_operands()
-        self.store(args[-1], addr, Type.int_8)
+    def commit_result(self, res):
+        self.store(res, self.dst)
 
 
 class Instruction_JR(GameboyInstruction):
@@ -73,8 +71,17 @@ class Instruction_LD_D16(GameboyInstruction):
     bin_format = '00rr0001' + 'd'*16
     name = 'LD r16,d16'
 
-    def compute_result(self, *args):
-        log.warn('Instruction %s semantics not implemented' % self.name)
+    def fetch_operands(self):
+        self.dst = self.put_r16_val(self.data['r'])
+        data = bits_to_le16(self.data['d'])
+        return self.dst, data
+
+    def compute_result(self, dst, data):
+        log.warn('Instruction %s flag semantics not implemented' % self.name)
+        return self.constant(data, Type.int_16)
+    
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 00xxx010
 # Count: 8 instructions
@@ -82,8 +89,22 @@ class Instruction_LD_REG16(GameboyInstruction):
     bin_format = '00rrd010'
     name = 'LD (r16),A'
 
-    def compute_result(self, *args):
+    def fetch_operands(self):
+        direction = int(self.data['d'], 2)
+        if direction == 0:
+            self.dst = self.put_r16_val_2(self.data['r'])
+            value = self.get('a', Type.int_8)
+        elif direction == 1:
+            self.dst = lambda val: self.put(val, 'a')
+            value = self.get_r16_val_2(self.data['r'])
+        return self.dst, value
+
+    def compute_result(self, dst, value):
         log.warn('Instruction %s semantics not implemented' % self.name)
+        return value
+    
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 00xx0011
 # Count: 4 instructions
@@ -91,8 +112,18 @@ class Instruction_INC_R16(GameboyInstruction):
     bin_format = '00ss0011'
     name = 'INC r16'
 
-    def compute_result(self, *args):
+    def fetch_operands(self):
+        self.dst = self.put_r16_val(self.data['ss'])
+        value = self.get_r16_val(self.data['ss'])
+
+        return self.dst, value
+
+    def compute_result(self, dst, value):
         log.warn('Instruction %s semantics not implemented' % self.name)
+        return value + 1
+    
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 00xxx100
 # Count: 8 instructions
@@ -100,8 +131,20 @@ class Instruction_INC_R8(GameboyInstruction):
     bin_format = '00ddd100'
     name = 'INC r8'
 
-    def compute_result(self, *args):
+    def fetch_operands(self):
+        self.dst = self.put_r8_val(self.data['d'])
+        value = self.get_r8_val(self.data['d'])
+        return self.dst, value
+
+    def compute_result(self, dst, value):
         log.warn('Instruction %s semantics not implemented' % self.name)
+        return value + 1
+    
+    def commit_result(self, res):
+        self.dst(res)
+    
+    def zero(self, dst, value, res):
+        return res == self.constant(0, res.ty)
 
 # Instruction block: 00xxx101
 # Count: 8 instructions
@@ -109,14 +152,38 @@ class Instruction_DEC_R8(GameboyInstruction):
     bin_format = '00ddd101'
     name = 'DEC r8'
 
-    def compute_result(self, *args):
+    def fetch_operands(self):
+        self.dst = self.put_r8_val(self.data['d'])
+        value = self.get_r8_val(self.data['d'])
+        return self.dst, value
+
+    def compute_result(self, dst, value):
         log.warn('Instruction %s semantics not implemented' % self.name)
+        return value - 1
+    
+    def commit_result(self, res):
+        self.dst(res)
+
+    def zero(self, dst, value, res):
+        return res == self.constant(0, res.ty)
 
 # Instruction block: 00xxx110
 # Count: 8 instructions
 class Instruction_LD_D8(GameboyInstruction):
     bin_format = '00rrr110' + 'd'*8
     name = 'LD reg,d8'
+
+    def fetch_operands(self):
+        self.dst = self.put_r8_val(self.data['r'])
+        data = int(self.data['d'], 2)
+        return self.dst, data
+
+    def compute_result(self, dst, data):
+        log.warn('Instruction %s flag semantics not implemented' % self.name)
+        return self.constant(data, Type.int_8)
+    
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 000xx111
 # Count: 4 instructions
@@ -172,8 +239,18 @@ class Instruction_DEC_R16(GameboyInstruction):
     bin_format = '00ss1011'
     name = 'DEC r16'
 
-    def compute_result(self, *args):
+    def fetch_operands(self):
+        self.dst = self.put_r16_val(self.data['ss'])
+        value = self.get_r16_val(self.data['ss'])
+
+        return self.dst, value
+
+    def compute_result(self, dst, value):
         log.warn('Instruction %s semantics not implemented' % self.name)
+        return value - 1
+    
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 01xxxxxx
 # Count: 1+63 = 64 instructions
@@ -183,110 +260,22 @@ class Instruction_HALT(GameboyInstruction):
 
     def compute_result(self, *args):
         self.jump(None, 0x10000, JumpKind.Exit)
+        return None
 
 class Instruction_LD_R8_R8(GameboyInstruction):
     bin_format = '01dddsss'
     name = 'LD r8,r8'
 
-    def compute_result(self, *args):
-        val = self.get_r8_val(self.data['s'])
-        self.put_r8_val(self.data['d'], val)
+    def fetch_operands(self):
+        src = self.get_r8_val(self.data['s'])
+        self.dst = self.put_r8_val(self.data['d'])
+        return src, self.dst
 
-# Instruction block: 10000xxx
-# Count: 8 instructions
-class Instruction_ADD_R8(GameboyInstruction):
-    bin_format = '10000sss'
-    name = 'ADD A,r8'
+    def compute_result(self, src, dst):
+        return src
 
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val + reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10001xxx
-# Count: 8 instructions
-class Instruction_ADC_R8(GameboyInstruction):
-    bin_format = '10001sss'
-    name = 'ADC A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val + reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10010xxx
-# Count: 8 instructions
-class Instruction_SUB_R8(GameboyInstruction):
-    bin_format = '10010sss'
-    name = 'SUB A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val - reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10011xxx
-# Count: 8 instructions
-class Instruction_SBC_R8(GameboyInstruction):
-    bin_format = '10011sss'
-    name = 'SBC A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val - reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10100xxx
-# Count: 8 instructions
-class Instruction_AND_R8(GameboyInstruction):
-    bin_format = '10100sss'
-    name = 'AND A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val & reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10101xxx
-# Count: 8 instructions
-class Instruction_XOR_R8(GameboyInstruction):
-    bin_format = '10101sss'
-    name = 'XOR A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val ^ reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10110xxx
-# Count: 8 instructions
-class Instruction_OR_R8(GameboyInstruction):
-    bin_format = '10110sss'
-    name = 'OR A,r8'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        self.put(a_val | reg_val, 'a') #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
-
-# Instruction block: 10111xxx
-# Count: 8 instructions
-class Instruction_CP_R8(GameboyInstruction):
-    bin_format = '10111sss'
-    name = 'CP'
-
-    def compute_result(self, *args):
-        a_val = self.get('a', Type.int_8)
-        reg_val = self.get_r8_val(self.data['s'])
-        #TODO: flags
-        log.warn('Instruction %s semantics not implemented' % self.name)
+    def commit_result(self, res):
+        self.dst(res)
 
 # Instruction block: 110xx000
 # Count: 4 instructions
@@ -312,12 +301,15 @@ class Instruction_JP_flag(GameboyInstruction):
     bin_format = '110ff010' + 'a'*16
     name = 'JP f,a16'
 
+    def fetch_operands(self):
+        dst = self.constant(bits_to_le16(self.data['a']), Type.int_16)
+        flag = int(self.data['f'], 2)
+        return dst, flag
+
     def disassemble(self):
         return self.addr, self.name, [self.data['a']]
 
-    def compute_result(self, *args):
-        dst = bits_to_le16(self.data['a'])
-        flag = int(self.data['f'], 2)
+    def compute_result(self, dst, flag):
         if flag == 0:
             self.jump(self.get_zero() == 0, dst)
         elif flag == 1:
@@ -328,6 +320,7 @@ class Instruction_JP_flag(GameboyInstruction):
             self.jump(self.get_carry() == 1, dst)
         else:
             raise ValueError('Variant %d not supported' % flag)
+        return None
 
 # Instruction block: 11000011
 # Count: 1 instructions
@@ -336,7 +329,7 @@ class Instruction_JP(GameboyInstruction):
     name = 'JP a16'
 
     def compute_result(self, *args):
-        dst = bits_to_le16(self.data['a'])
+        dst = self.constant(bits_to_le16(self.data['a']), Type.int_16)
         self.jump(None, dst)
 
 # Instruction block: 11001101
@@ -346,7 +339,7 @@ class Instruction_CALL(GameboyInstruction):
     name = 'CALL a16'
 
     def compute_result(self, *args):
-        dst = bits_to_le16(self.data['a'])
+        dst = self.constant(bits_to_le16(self.data['a']), Type.int_16)
         self.jump(None, dst, jumpkind=JumpKind.Call)
 
 # Instruction block: 110xx100
@@ -359,7 +352,7 @@ class Instruction_CALL_flag(GameboyInstruction):
         return self.addr, self.name, [self.data['a']]
 
     def compute_result(self, *args):
-        dst = bits_to_le16(self.data['a'])
+        dst = self.constant(bits_to_le16(self.data['a']), Type.int_16)
         flag = int(self.data['f'], 2)
         if flag == 0:
             self.jump(self.get_zero() == 0, dst, jumpkind=JumpKind.Call)
@@ -415,7 +408,8 @@ class Instruction_DI(GameboyInstruction):
     name = 'DI'
 
     def compute_result(self, *args):
-        self.store(self.constant(0, Type.int_8), self.constant(0xFFFF, Type.int_16))
+        addr = self.constant(0xFFFF, Type.int_16)
+        self.store(self.constant(0, Type.int_8), addr)
 
 # Instruction block: 11111011
 # Count: 1 instructions
@@ -424,7 +418,8 @@ class Instruction_EI(GameboyInstruction):
     name = 'EI'
 
     def compute_result(self, *args):
-        self.put(self.constant(1, Type.int_8), self.constant(0xFFFF, Type.int_16))
+        addr = self.constant(0xFFFF, Type.int_16)
+        self.put(self.constant(1, Type.int_8), addr)
 
 # Instruction block: 11101000
 # Count: 1 instructions
