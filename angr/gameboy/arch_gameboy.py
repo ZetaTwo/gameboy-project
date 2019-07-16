@@ -36,6 +36,13 @@ class ArchGameboy(Arch):
         ('pc', 0x100, False, None)
     ]
 
+    flags = {
+        'ZERO': 7,
+        'NEGATIVE': 6,
+        'HALF_CARRY': 5,
+        'CARRY': 4
+    }
+
     def __init__(self, endness=Endness.LE):
         super().__init__(endness)
 
