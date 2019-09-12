@@ -27,3 +27,7 @@
 * [DMG LCD Sniffing](https://github.com/svendahlstrand/game-boy-lcd-sniffing)
 * [DMG LCD Pinout](https://hackaday.com/2010/11/10/diving-deep-into-the-game-boy-lcd-protocol/)
 * [GB Pocket LCD Pinout](https://chipmusic.org/forums/topic/14000/solved-pocket-lcd-in-dmg/)
+
+# Emulator design
+
+* [Holy grail bugs](https://mgba.io/2017/05/29/holy-grail-bugs/)
