@@ -30,5 +30,5 @@ if len(sys.argv) < 3:
     print('Displaying image')
     im.show()
 else:
-    print('Saming image to "%s"' % sys.argv[2])
+    print('Saving image to "%s"' % sys.argv[2])
     im.save(sys.argv[2])
