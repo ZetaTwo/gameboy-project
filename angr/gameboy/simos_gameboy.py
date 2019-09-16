@@ -41,6 +41,10 @@ class MCgetsn(SimProcedure):
     #    return self.state.solver.Unconstrained('getsn', self.state.arch.bits)
 
 
+def write_hook(state):
+    # state.inspect.mem_write_condition = False # Prevent the write
+    pass
+
 class SimGameboy(SimOS):
     # Syscalls are for lamers
     SYSCALL_TABLE = {}
@@ -57,11 +61,15 @@ class SimGameboy(SimOS):
     def state_blank(self, data_region_size=0x8000, **kwargs):
         # pylint:disable=arguments-differ
         state = super(SimGameboy, self).state_blank(**kwargs)  # pylint:disable=invalid-name
+        print(state)
+        print(state.mem)
         # PTR starts halfway through memory
         return state
 
     def state_entry(self, **kwargs):
         state = super(SimGameboy, self).state_entry(**kwargs)
+        print(state)
+        print(state.mem)
         return state
 
 

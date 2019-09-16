@@ -35,6 +35,7 @@ state = proj.factory.entry_state()
 sm = proj.factory.simgr(state)
 #sm.step()
 #sm.explore(find=0x150)
+"""
 sm.explore(find=0x151)
 
 found = sm.found[0]
@@ -43,3 +44,4 @@ print(found.regs.a)
 print(found.regs.b)
 print(found.regs.sp)
 print(found.regs.hl)
+"""
