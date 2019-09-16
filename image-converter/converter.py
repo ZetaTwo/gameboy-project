@@ -75,20 +75,30 @@ def create_tiles(colormap):
     print('// Number of unique tiles: %d' % len(tiles))
     return len(tiles) <= 256, tiles, tilemap
 
+def luminance(color):
+    R, G, B, _ = color
+    return 0.2126*R + 0.7152*G + 0.0722*B
+
 def index_colors(pixels):
     """Convert pixel values to indices and index image"""
     colors = {}
+    #colorflip = [0, 3, 2, 1] # Front
+    #colorflip = [0, 3, 2, 1] # Crash
+    #colorflip = [3, 2, 1, 0] # Flag
+    colorflip = [0, 2, 1, 3]
+    #colorflip = [0, 1, 2, 3]
     colormap = []
     for row in pixels:
         index_row = []
         for px in row:
             if px not in colors:
-                colors[px] = len(colors)
+                colors[px] = colorflip[len(colors)]
             index_row.append(colors[px])
         colormap.append(index_row)
     
     colors = {v:k for k,v in colors.items()}
     colors = [colors[k] for k in sorted(colors.keys())]
+
     print('// Number of unique colors: %d' % len(colors))
     return len(colors) <= 4, colors, colormap
 
