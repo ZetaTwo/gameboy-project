@@ -1,0 +1,8 @@
+*.bin
+*.rpt
+*.blif
+*.asc
+*.json
+*.log
+core
+
