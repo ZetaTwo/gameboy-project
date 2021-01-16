@@ -1,0 +1,7 @@
+obj_dir
+gameboy_capture_card
+*.asc
+*.bin
+*.json
+*.log
+*.rpt
