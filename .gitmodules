@@ -4,3 +4,6 @@
 [submodule "gbparse"]
 	path = gbparse
 	url = git@github.com:ZetaTwo/gbparse.git
+[submodule "binja-gameboy"]
+	path = binja-gameboy
+	url = https://github.com/ZetaTwo/binja-gameboy
