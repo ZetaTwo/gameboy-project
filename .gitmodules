@@ -1,9 +1,12 @@
 [submodule "gbgenie"]
 	path = gbgenie
 	url = git@github.com:ZetaTwo/gbgenie.git
+	branch = master
 [submodule "gbparse"]
 	path = gbparse
 	url = git@github.com:ZetaTwo/gbparse.git
+	branch = master
 [submodule "binja-gameboy"]
 	path = binja-gameboy
 	url = https://github.com/ZetaTwo/binja-gameboy
+	branch = master
