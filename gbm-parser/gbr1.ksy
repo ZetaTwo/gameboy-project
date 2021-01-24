@@ -92,10 +92,13 @@ types:
       - id: data
         type: object_map_tile_data_record
         repeat: expr
-        repeat-expr: master.tile_count
+        #repeat-expr: master.tile_count
+        repeat-expr: 0
     instances:
       master:
-        value: find_master(master_id) # <--- Doesn't work (https://github.com/kaitai-io/kaitai_struct/issues/172)
+      #  value: find_master(master_id) # <--- Doesn't work (https://github.com/kaitai-io/kaitai_struct/issues/172)
+        value: 0
+         
 
   object_map_tile_data_record:
     seq:
