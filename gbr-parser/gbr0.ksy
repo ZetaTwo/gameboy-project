@@ -10,10 +10,10 @@ meta:
   tags:
     - game
 
-doc-ref: http://www.devrs.com/gb/hmgd/gbtd.html
 doc: |
   GBR0 files are used by GameBoy Tile Designer
   to store tilemaps created with the program.
+doc-ref: http://www.devrs.com/gb/hmgd/gbtd.html
 
 seq:
   - id: magic

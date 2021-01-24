@@ -10,10 +10,10 @@ meta:
   tags:
     - game
 
-doc-ref: http://www.devrs.com/gb/hmgd/gbmb.html
 doc: |
   GBR1 files are used by Gameboy Map Builder, GBMB
   to store maps created with the program.
+doc-ref: http://www.devrs.com/gb/hmgd/gbmb.html
 
 seq:
   - id: magic
