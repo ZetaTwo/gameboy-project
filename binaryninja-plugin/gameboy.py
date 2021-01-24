@@ -258,6 +258,8 @@ class LR35902(Architecture):
                     result.add_branch(BranchType.UnconditionalBranch, arg)
         elif ins_mnem == 'RET':
             result.add_branch(BranchType.FunctionReturn)
+        elif ins_mnem == 'RETI':
+            result.add_branch(BranchType.FunctionReturn)
         elif ins_mnem == 'CALL':
             result.add_branch(BranchType.CallDestination,
                               struct.unpack("<H", data[1:3])[0])

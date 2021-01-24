@@ -38,6 +38,22 @@ class GameboyRomView(BinaryView):
         ('HRAM', 0xFF80, 0x80),
     ]    
 
+    INTERRUPT_HANDLERS = [
+        ('isr_usr0', 0x00),
+        ('isr_usr1', 0x08),
+        ('isr_usr2', 0x10),
+        ('isr_usr3', 0x18),
+        ('isr_usr4', 0x20),
+        ('isr_usr5', 0x28),
+        ('isr_usr6', 0x30),
+        ('isr_usr7', 0x38),
+        ('isr_vblank', 0x40),
+        ('isr_lcd', 0x48),
+        ('isr_timer', 0x50),
+        ('isr_serial', 0x58),
+        ('isr_joypad', 0x60),
+    ]
+
     def __init__(self, data):
         BinaryView.__init__(self, parent_view = data, file_metadata = data.file)
         self.platform = Architecture[LR35902.name].standalone_platform
@@ -84,13 +100,18 @@ class GameboyRomView(BinaryView):
         for _, address, length in self.RAM_SEGMENTS:
             self.add_auto_segment(address, length, 0, 0, SegmentFlag.SegmentReadable | SegmentFlag.SegmentWritable | SegmentFlag.SegmentExecutable)
 
-        # Add special registers
+        # Add IO registers
         for address, name in LR35902.IO_REGISTERS.items():
             self.define_auto_symbol_and_var_or_function(Symbol(SymbolType.DataSymbol, address, name), Type.int(1))
 
         # Define entrypoint
         self.define_auto_symbol(Symbol(SymbolType.FunctionSymbol, self.START_ADDR, "_start"))
         self.add_entry_point(self.START_ADDR)
+
+        # Define interrupts
+        for name, address in self.INTERRUPT_HANDLERS:
+            self.define_auto_symbol(Symbol(SymbolType.FunctionSymbol, address, name))
+            #self.define_auto_symbol_and_var_or_function(Symbol(SymbolType.FunctionSymbol, address, name), Type.function(Type.void(), []))
 
         return True
 
