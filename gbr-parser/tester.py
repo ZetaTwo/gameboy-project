@@ -92,20 +92,20 @@ def parse_object_deleted(body):
 
 
 body_parsers = {
-    0x0001: parse_object_producer,
-    0x0002: parse_object_tile_data,
-    0x0003: parse_object_tile_settings,
-    0x0004: parse_object_tile_export,
-    0x0005: parse_object_tile_import,
-    0x000D: parse_object_palettes,
-    0x000E: parse_object_tile_pal,
-    0x00FF: parse_object_deleted,
+    Gbr0.Gbr0Object.Type.producer:      parse_object_producer,
+    Gbr0.Gbr0Object.Type.tile_data:     parse_object_tile_data,
+    Gbr0.Gbr0Object.Type.tile_settings: parse_object_tile_settings,
+    Gbr0.Gbr0Object.Type.tile_export:   parse_object_tile_export,
+    Gbr0.Gbr0Object.Type.tile_import:   parse_object_tile_import,
+    Gbr0.Gbr0Object.Type.palettes:      parse_object_palettes,
+    Gbr0.Gbr0Object.Type.tile_pal:      parse_object_tile_pal,
+    Gbr0.Gbr0Object.Type.deleted:       parse_object_deleted,
 }
 
 def dump_gbr_file(file):
     print(gbr0.magic)
     for gbr_object in gbr0.objects:
-        print('Type: %04X, ID: %d' % (gbr_object.object_type, gbr_object.object_id))
+        print('Type: %s, ID: %d' % (gbr_object.object_type, gbr_object.object_id))
         print('Size: %d' % gbr_object.record_length)
         body_parsers[gbr_object.object_type](gbr_object.body)
         print('')

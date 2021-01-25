@@ -48,23 +48,23 @@ def parse_object_deleted(body):
 
 
 body_parsers = {
-    0x0001: parse_object_producer,
-    0x0002: parse_object_map,
-    0x0003: parse_object_map_tile_data,
-    0x0004: parse_object_map_properties,
-    0x0005: parse_object_map_property_data,
-    0x0006: parse_object_map_default_property_value,
-    0x0007: parse_object_map_settings,
-    0x0008: parse_object_map_property_colors,
-    0x0009: parse_object_map_export_settings,
-    0x000A: parse_object_map_export_properties,
-    0xFFFF: parse_object_deleted,
+    Gbr1.Gbr1Object.Type.producer:                   parse_object_producer,
+    Gbr1.Gbr1Object.Type.map:                        parse_object_map,
+    Gbr1.Gbr1Object.Type.map_tile_data:              parse_object_map_tile_data,
+    Gbr1.Gbr1Object.Type.map_properties:             parse_object_map_properties,
+    Gbr1.Gbr1Object.Type.map_property_data:          parse_object_map_property_data,
+    Gbr1.Gbr1Object.Type.map_default_property_value: parse_object_map_default_property_value,
+    Gbr1.Gbr1Object.Type.map_settings:               parse_object_map_settings,
+    Gbr1.Gbr1Object.Type.map_property_colors:        parse_object_map_property_colors,
+    Gbr1.Gbr1Object.Type.map_export_settings:        parse_object_map_export_settings,
+    Gbr1.Gbr1Object.Type.map_export_properties:      parse_object_map_export_properties,
+    Gbr1.Gbr1Object.Type.deleted:                    parse_object_deleted,
 }
 
 def dump_gbr_file(file):
     print(gbr1.magic)
     for gbr_object in gbr1.objects:
-        print('Type: %04X, ID: %d' % (gbr_object.object_type, gbr_object.object_id))
+        print('Type: %s, ID: %d' % (gbr_object.object_type, gbr_object.object_id))
         print('Size: %d' % gbr_object.object_length)
         body_parsers[gbr_object.object_type](gbr_object.body)
         print('')
