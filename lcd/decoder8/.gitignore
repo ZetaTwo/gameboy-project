@@ -5,3 +5,4 @@ gameboy_capture_card
 *.json
 *.log
 *.rpt
+.env

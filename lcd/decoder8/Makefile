@@ -3,6 +3,7 @@
 PROJ = gameboy_capture_card
 PIN_DEF = icebreaker.pcf
 DEVICE = up5k
+ADD_SRC = gameboy_frame_buffer.v gameboy_lcd_decoder.v hdmi_output.v
 
 all: $(PROJ).rpt $(PROJ).bin
 
