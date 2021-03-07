@@ -145,7 +145,7 @@ types:
             type: record
             repeat: expr
             repeat-expr: num_records
-        
+
         instances:
           num_records:
             value: master.object.as<gbr1_object>.body.as<map>.prop_count
@@ -163,7 +163,7 @@ types:
             type: record
             repeat: expr
             repeat-expr: num_records
-        
+
         instances:
           num_records:
             value: master.object.as<gbr1_object>.body.as<map>.prop_count * master.object.as<gbr1_object>.body.as<map>.width * master.object.as<gbr1_object>.body.as<map>.height
@@ -181,7 +181,7 @@ types:
             type: record
             repeat: expr
             repeat-expr: num_records
-        
+
         instances:
           num_records:
             value: master.object.as<gbr1_object>.body.as<map>.prop_count * master.object.as<gbr1_object>.body.as<map>.tile_count
@@ -234,7 +234,7 @@ types:
             type: record
             repeat: expr
             repeat-expr: num_records
-        
+
         instances:
           num_records:
             value: master.object.as<gbr1_object>.body.as<map>.prop_color_count
@@ -289,7 +289,7 @@ types:
             type: record
             repeat: expr
             repeat-expr: num_records
-        
+
         instances:
           num_records:
             value: master.object.as<gbr1_object>.body.as<map>.prop_count
