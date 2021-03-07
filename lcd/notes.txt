@@ -1,0 +1,38 @@
+Gameboy pocket LCD pinout:
+
+1 - GND
+2 - Control
+3 - Data latch
+4 - Horiz Sync
+5 - Data 0
+6 - Data 1
+7 - Clock
+8 - Alt Sig
+9 - V5
+10 - V3
+11 - V2
+12 - Data latch
+13 - VSYNC
+14 - Vcc (5 volts)
+15 - Alt sign
+16 - V1
+17 - V4
+18 - V5
+
+Test probes:
+1 - GND - P2-GND
+4 - Horiz Sync - P2-ST
+5 - Data 0 - P2-LD1
+6 - Data 1 - P2-LD0
+7 - Clock - P2-CP
+13 -VSYNC - P2-S
+
+http://www.spritesmind.net/retro/2VGA/2VGA.html
+
+
+black
+orange
+brown
+blue
+yellow
+green
