@@ -13,8 +13,8 @@ Current roadmap of the project
   - Model banking (segmment register, virtual 8+16=24 bit space)
   - Model periodic interrupts (vlank, hblank)
 * HDMI adapter
-  - Real time capture (go peroph.io)
-  - Real time rendering (SDL?)
+  - Real time capture (FPGA+Verilog)
+  - Real time rendering (SDL)
   - Sound (USB sound card + 3,5mm cable)
 * Emulation
   - Cycle perfect emulation
